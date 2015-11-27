@@ -1,19 +1,19 @@
 require('newrelic');
+var packageInfo = require("./package.json");
 
-var appName = "3ps";
 var config = require('config');
 
 var once = require('once');
 var _ = require('lodash');
 
-var debug = require('debug')(appName);
+var debug = require('debug')(packageInfo.name);
 var bunyan = require('bunyan');
 var rollbar = require('rollbar');
 
 var MongoClient = require('mongodb').MongoClient;
 
 var log = bunyan.createLogger({
-  name: appName,
+  name: packageInfo.name,
   streams: [
     {
       level: "info",
