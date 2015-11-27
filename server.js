@@ -1,18 +1,27 @@
-require('newrelic');
+// Configuration files
 var packageInfo = require("./package.json");
-
 var config = require('config');
 
+// Logging / Debug
+var bunyan = require('bunyan');
+var debug = require('debug')(packageInfo.name);
+
+// Metrics
+var rollbar = require('rollbar');
+require('newrelic');
+
+// Libraries
 var once = require('once');
 var _ = require('lodash');
 
-var debug = require('debug')(packageInfo.name);
-var bunyan = require('bunyan');
-var rollbar = require('rollbar');
-
+// DB
 var MongoClient = require('mongodb').MongoClient;
+var pluginDatabase;
 
-var log = bunyan.createLogger({
+// Frameworks
+var restify = require('restify');
+
+var logger = bunyan.createLogger({
   name: packageInfo.name,
   streams: [
     {
@@ -28,20 +37,31 @@ var log = bunyan.createLogger({
 
 MongoClient.connect(config.get('mongodb.url'), function(err, db) {
   if (err) {
-    log.error("Connection to MongoDB failed - %s", err);
+    logger.error("Connection to MongoDB failed - %s", err);
+    return;
   }
 
   db.on('close', function() {
-    log.info("Closing connection to MongoDB");
+    logger.info("Closing connection to MongoDB");
   });
+
+  pluginDatabase = db;
 });
 
-var express = require('express');
+rollbar.init(config.get('rollbar.apiKey', {
+  environment: process.env.NODE_ENV
+  })
+);
 
-var app = express();
+var server = restify.createServer({
+  log: logger
+});
 
-app.use(rollbar.errorHandler(config.get('rollbar.apiKey')));
+server.get("/", function(req, res, next) {
+  res.send({ "hello": "world" });
+  return next();
+});
 
-app.get('/', function (req, res) {
-    res.send('Hello World!');
+server.listen(31337, function() {
+  logger.info("%s listening at %s", server.name, server.url);
 });
