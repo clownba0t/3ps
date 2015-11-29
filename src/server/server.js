@@ -74,11 +74,6 @@ function setup() {
     });
 
     app = express();
-    app.use(rollbar.errorHandler(config.get('rollbar.apiKey', {
-        environment: process.env.NODE_ENV
-    })));
-    // Do this in nginx instead?
-    app.use(express.static("public"));
     app.set("view engine", "jade");
     app.set("views", "./views");
 
@@ -96,6 +91,16 @@ function setup() {
             }
         });
     });
+
+    var rollbarApiKey = config.get("rollbar.apiKey", { environment: getEnvironment() });
+    app.use(rollbar.errorHandler(rollbarApiKey, {
+        environment: process.env.NODE_ENV,
+        root: __dirName,
+    }));
+    rollbar.handleUncaughtExceptions(rollbarApiKey, { exitOnUncaughtException: true });
+
+    // Do this in nginx instead?
+    app.use(express.static("public"));
 
     server = app.listen(SERVER_PORT, function() {
         var host = server.address().address;
@@ -129,6 +134,9 @@ function runChecks() {
     setTimeout(runChecks, CHECK_INTERVAL);
 }
 
+function getEnvironment() {
+    return process.env.NODE_ENV;
+}
 
 // "main"
 
