@@ -1,0 +1,3 @@
+{
+  "ignore": ["*.sw*", "nodemon.json", "log/*", "*.test.js", "fixtures/*", "config/webpack.config.dev.js"]
+}
