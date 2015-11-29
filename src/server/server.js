@@ -95,7 +95,7 @@ function setup() {
     var rollbarApiKey = config.get("rollbar.apiKey", { environment: getEnvironment() });
     app.use(rollbar.errorHandler(rollbarApiKey, {
         environment: process.env.NODE_ENV,
-        root: __dirName,
+        root: __dirname,
     }));
     rollbar.handleUncaughtExceptions(rollbarApiKey, { exitOnUncaughtException: true });
 
