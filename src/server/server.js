@@ -35,7 +35,9 @@ var SERVER_PORT = 31337;
 
 var CHECK_CLASSES = [
     require("./github_check.js"),
-    require("./airbrake_check.js")
+    require("./airbrake_check.js"),
+    require("./new_relic_check.js"),
+    require("./travis_ci_check.js")
 ];
 
 var CHECK_INTERVAL = 5 * 60 * 1000;
