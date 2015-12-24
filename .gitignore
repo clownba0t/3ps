@@ -29,3 +29,6 @@ node_modules
 
 # Local (secret) configuration data
 config/local.json
+
+# Lib (should be built from src)
+lib
